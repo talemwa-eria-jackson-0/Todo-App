@@ -1,0 +1,20 @@
+.form-outline {
+    position: relative;
+}
+
+.form-outline input {
+    padding-top: 1.5rem;
+}
+
+.form-outline input:focus ~ .form-label {
+    top: 0.25rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.form-label {
+    position: absolute;
+    top: 1rem;
+    left: 0.75rem;
+    transition: top 0.2s, font-size 0.2s, color 0.2s;
+}

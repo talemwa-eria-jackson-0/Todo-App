@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+
+    <!-- MDB LINKS  -->
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.css" rel="stylesheet" />
+
+    <!-- BOOTSTRAP  -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+
+    <style>
+        /* Your CSS styles here */
+        #list1 .form-control {
+            border-color: transparent;
+        }
+
+        #list1 .form-control:focus {
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        #list1 .select-input.form-control[readonly]:not([disabled]) {
+            background-color: #fbfbfb;
+        }
+
+        /* Center the Add Button and Use a Plus Sign */
+        .center-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .add-button {
+            font-size: 20px;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="vh-100">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col">
+                    <div class="card" id="list1" style="border-radius: .75rem; background-color: #eff1f2;">
+                        <div class="card-body py-4 px-4 px-md-5">
+                            <p
+                                class="text-center mt-3 mb-4 pb-3 text-primary d-flex justify-content-between align-items-center">
+                                <span class="h1">
+                                    <i class="fas fa-check-square me-1"></i>
+                                    <u>Todo List</u>
+                                </span>
+                                <span>
+                                    <i class="fas fa-user me-2"></i>{{ current_user.username }}
+                                    <a href="{{ url_for('logout') }}" class="btn btn-danger ms-3">Logout</a>
+                                </span>
+                            </p>
+                            <div class="pb-2">
+                                <div class="card">
+                                    <div class="card-body">
+
+                                        <!-- ... (other code) -->
+
+                                        <div class="d-flex flex-row align-items-center">
+
+
+                                            <div class="d-flex flex-row align-items-center center-button">
+                                                <button type="button" class="btn btn-primary add-button"
+                                                    data-mdb-toggle="modal" data-mdb-target="#addTaskModal">
+                                                    <i class="fas fa-plus"></i> Add
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Task List -->
+                            <ul class="list-group bg-transparent">
+                                {% for task in tasks %}
+                                <li class="list-group-item border-0 bg-transparent">
+                                    <div class="d-flex align-items-center">
+                                        <form method="post" action="/toggle_task_completion/{{ task.id }}" class="form-inline">
+                                            {{ form.hidden_tag() }}
+                                            <input type="hidden" name="completed" value="{{ task.completed|int }}">
+                                            <div class="form-check me-3">
+                                                <input class="form-check-input" type="checkbox" value=""
+                                                    id="flexCheckChecked{{ loop.index }}" aria-label="..."
+                                                    {% if task.completed %}checked{% endif %}
+                                                    onclick="this.form.submit()">
+                                            </div>
+                                        </form>
+                                        
+                                        <div class="flex-grow-1">
+                                            <p class="lead fw-normal mb-0">{{ task.task }}</p>
+                                            <p class="small text-muted mb-0">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                {% if task.due_date %}
+                                                {{ task.due_date.strftime('%d %b %Y') }}
+                                                {% else %}
+                                                No due date
+                                                {% endif %}
+                                                {% if task.due_time %}
+                                                {{ task.due_time.strftime('%H:%M') }}
+                                                {% else %}
+                                                No due time
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="mx-3">
+                                            <a href="#" class="btn btn-sm btn-secondary">{{ task.category }}</a>
+                                        </div>
+                                        <div class="ms-3">
+                                            <a href="#" class="text-danger delete-task-button" data-mdb-toggle="modal"
+                                                data-mdb-target="#deleteTaskModal" data-task-id="{{ task.id }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                        <div class="ms-3">
+                                            <a href="#" class="text-info edit-task-button" data-mdb-toggle="modal"
+                                                data-mdb-target="#editTaskModal-{{ task.id }}"
+                                                data-task-id="{{ task.id }}">
+                                                <i class="fas fa-pencil-alt"></i> Edit
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                <!-- Edit Task Modal -->
+                                <div class="modal fade" id="editTaskModal-{{ task.id }}" tabindex="-1"
+                                    aria-labelledby="editTaskModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                                                <button type="button" class="btn-close" data-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <!-- <form method="post" action="/edit_task" id="editTaskForm"> -->
+
+                                                <form method="post" action="/edit_task/{{ task.id }}">
+                                                    {{ form.hidden_tag() }}
+                                                    <div class="mb-3">
+                                                        <label for="taskText" class="form-label">Task</label>
+                                                        <input type="text" class="form-control" id="taskText"
+                                                            name="task" value="{{ task.task }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="description" class="form-label">Description</label>
+                                                        <textarea class="form-control" id="description" rows="3"
+                                                            name="description">{{ task.description }}</textarea>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="dueDate" class="form-label">Due Date</label>
+                                                        <input type="date" class="form-control" id="dueDate"
+                                                            name="due_date" value="{{ task.due_date|default('') }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="dueTime" class="form-label">Due Time</label>
+                                                        <input type="time" class="form-control" id="dueTime"
+                                                            name="due_time" value="{{ task.due_time|default('') }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="priority" class="form-label">Priority</label>
+                                                        <select class="form-select" id="priority" name="category">
+                                                            <option value="low" {% if task.category=='low' %}selected{%
+                                                                endif %}>Low
+                                                            </option>
+                                                            <option value="medium" {% if task.category=='medium'
+                                                                %}selected{% endif %}>
+                                                                Medium</option>
+                                                            <option value="high" {% if task.category=='high'
+                                                                %}selected{% endif %}>
+                                                                High</option>
+                                                        </select>
+                                                    </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-mdb-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Update Task</button>
+                                            </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Task Modal -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+        <!-- ... (your existing add task modal content) ... -->
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="/add_task">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label for="taskText" class="form-label">Task</label>
+                            <input type="text" class="form-control" id="taskText" name="task" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="3" name="description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dueDate" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="dueDate" name="due_date">
+                        </div>
+                        <div class="mb-3">
+                            <label for="dueTime" class="form-label">Due Time</label>
+                            <input type="time" class="form-control" id="dueTime" name="due_time">
+                        </div>
+                        <div class="mb-3">
+                            <label for="priority" class="form-label">Priority</label>
+                            <select class="form-select" id="priority" name="category">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Task</button>
+                </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Delete Task Modal -->
+    <div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTaskModalLabel">Delete Task</h5>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this task?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteTask" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <!-- MDB -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-mdb-toggle="tooltip"]').tooltip();
+
+            $('.edit-task-button').click(function () {
+                var taskId = $(this).data('task-id');
+                var task = getTaskById(taskId); // Implement a function to fetch task details by ID
+                fillEditTaskForm(task);
+            });
+
+            // Handle click event for delete task button
+            $('.delete-task-button').click(function () {
+                var taskId = $(this).data('task-id');
+                $('#confirmDeleteTask').attr('href', '/delete_task/' + taskId); // Update link
+            });
+
+
+
+            // Function to fetch task details by ID (replace with actual implementation)
+            // function getTaskById(taskId) {
+            //     // Replace with actual code to fetch task details from your data source (e.g., database)
+            //     return {
+            //         id: taskId,
+            //         task: "Task Name",
+            //         description: "Task Description",
+            //         due_date: "2023-08-15",
+            //         due_time: "12:00",
+            //         category: "high"
+            //     };
+            // }
+
+            function fillEditTaskForm(task) {
+                $('#taskText').val(task.task);
+                $('#description').val(task.description);
+                $('#dueDate').val(task.due_date);
+                $('#dueTime').val(task.due_time);
+                $('#priority').val(task.category);
+                $('#editTaskModal').modal('show');
+            }
+        });
+
+        function toggleTaskCompletion(taskId, checked) {
+        $.ajax({
+            type: "POST",
+            url: `/toggle_task_completion/${taskId}/${checked ? 1 : 0}`,
+            success: function (data) {
+                console.log(data.message);
+            },
+            error: function (error) {
+                console.error("An error occurred:", error);
+            }
+        });
+    }
+    
+    </script>
+
+</body>
+
+</html>

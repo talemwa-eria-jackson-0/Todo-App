@@ -1,0 +1,75 @@
+
+/* Your CSS styles here */
+/* #list1 .form-control {
+    border-color: transparent;
+}
+
+#list1 .form-control:focus {
+    border-color: transparent;
+    box-shadow: none;
+} */
+
+#list1 .select-input.form-control[readonly]:not([disabled]) {
+    background-color: #fbfbfb;
+}
+
+/* Center the Add Button and Use a Plus Sign */
+.center-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky; 
+    bottom: 10px;
+}
+
+.add-button {
+    font-size: 10px;
+    padding: 10px 40px;
+}
+
+/* Custom CSS for button */
+.add-button {
+    display: block; /* Ensure the button takes full width */
+    margin: 0 auto; /* Center the button horizontally */
+}
+
+/* Custom CSS to adjust button width on small screens */
+@media (max-width: 576px) {
+    .add-button {
+        width: 100%; /* Make the button full width on small screens */
+    }
+}
+
+/* Strikethrough style for completed tasks */
+.completed {
+    text-decoration: line-through;
+}
+
+/* Custom CSS to enforce a fixed width on badges */
+.fixed-badge {
+    width: 80px; /* You can adjust this width as needed */
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Custom CSS to hide badges on small screens */
+@media (max-width: 800px) {
+    .hide-on-sm {
+        display: none;
+    }
+}
+
+/* font size for plus/add */
+.plus {
+    font-size: 16px;
+}
+
+/* Add some basic styles for flash messages */
+
+.flash-message {
+    padding: 5px;
+    color: rgb(15, 131, 54);
+    list-style-type: none;
+}
